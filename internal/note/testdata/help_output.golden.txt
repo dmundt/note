@@ -1,0 +1,68 @@
+note manages plain markdown notes in the current workspace.
+
+Usage:
+	note help
+	note init [full|--full]
+	note completion <bash|zsh|powershell|fish>
+	note new fleeting "title"
+	note new permanent "title"
+	note new project <project-slug> "title"
+	note list [--type <type>] [--format <pipe|plain|table|json>]
+	note recent [--type <type>] [n]
+	note tags [--type <type>]
+	note search [--type <type>] [--project <project-slug>] [--tag <tag>] [--format <pipe|plain|table|json>] [--strict] [query]
+	note serve [--addr <host:port>] [--open]
+	note backlinks <id>
+	note open <id>
+	note delete <id>
+	note link <from-id> <to-id>
+	note doctor
+	note stats
+	note export [--type <type>] [--output <file>]
+	note promote [--title "New Title"] <id>
+	note meta set <id> <field> <value>
+	note meta add-tag <id> <tag>
+	note meta remove-tag <id> <tag>
+
+Commands:
+	init        Scaffold a new note workspace. Default: notes + note.json; full: also create templates/.
+	completion  Print shell completion script for bash, zsh, powershell, or fish.
+	new         Create a note from the configured template and print the created file path.
+	list        List all notes sorted by ID descending.
+	recent      Show the N most recently created notes (default 10).
+	tags        List all tags with occurrence counts.
+	search      Search note titles, bodies, and paths; prints pipe-separated matches.
+	serve       Start a local web UI (Go templates + HTMX) to browse rendered notes.
+	backlinks   Show notes that link to a target note ID.
+	open        Open a note in $VISUAL / $EDITOR.
+	delete      Remove a note file and warn about dangling backlinks.
+	link        Inject a markdown link from one note into another.
+	doctor      Validate notes for duplicate IDs, metadata issues, and broken links.
+	stats       Print note counts by type and a total count.
+	export      Concatenate notes into a single Markdown document.
+	promote     Move a fleeting or project note into permanent notes.
+	meta        Update title, project, or tags for an existing note.
+
+Examples:
+	note init
+	note init full
+	note new fleeting "capture idea"
+	note new project pkm "outline note flow"
+	note list
+	note list --type permanent
+	note recent 5
+	note tags
+	note search --type permanent links
+	note serve --open
+	note backlinks 20260408153042
+	note open 20260408153042
+	note delete 20260408153042
+	note link 20260408153042 20260408160000
+	note doctor
+	note stats
+	note export --output all-notes.md
+	note promote --title "Permanent Insight" 20260408153042
+	note search --tag inbox
+	note meta set 20260408153042 title "Better Title"
+	note meta add-tag 20260408153042 zettel
+	note completion powershell | Out-String | Invoke-Expression

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "idFormat": "20060102150405",
+  "filenamePattern": "{id}-{slug}.md",
+  "linkStyle": "wiki-id",
+  "searchOutputDefault": "pipe",
+  "noteTypes": {
+    "fleeting": {
+      "dir": "notes/fleeting",
+      "template": "templates/fleeting.md",
+      "frontmatter": [
+        "id",
+        "title",
+        "type",
+        "created",
+        "tags",
+        "source"
+      ]
+    },
+    "permanent": {
+      "dir": "notes/permanent",
+      "template": "templates/permanent.md",
+      "frontmatter": [
+        "id",
+        "title",
+        "type",
+        "created",
+        "tags",
+        "updated"
+      ]
+    },
+    "project": {
+      "dir": "notes/project",
+      "template": "templates/project.md",
+      "frontmatter": [
+        "id",
+        "title",
+        "type",
+        "project",
+        "created",
+        "tags",
+        "updated"
+      ]
+    }
+  }
+}

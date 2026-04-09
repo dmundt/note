@@ -1,0 +1,3 @@
+202604081531 | project | Release Plan | notes/project/202604081531-release-plan.md
+202604081530 | permanent | Linking Notes | notes/permanent/202604081530-linking-notes.md
+202604081529 | fleeting | Capture Idea | notes/fleeting/202604081529-capture-idea.md

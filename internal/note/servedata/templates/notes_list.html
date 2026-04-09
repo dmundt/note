@@ -1,0 +1,13 @@
+{{define "notes_list"}}
+{{if not .Notes}}
+<div class="empty">No notes found.</div>
+{{else}}
+{{range .Notes}}
+<a class="note-link {{if eq $.SelectedNoteID .ID}}is-selected{{end}}" data-note-id="{{.ID}}" href="/note/{{.ID}}"
+  hx-get="/note/{{.ID}}" hx-include="#filters" hx-push-url="true" hx-target="#note-detail" hx-swap="innerHTML">
+  <div><strong>{{.TitleHTML}}</strong></div>
+  <div class="meta">{{.ID}} · {{.Type}} · {{.PathHTML}}</div>
+</a>
+{{end}}
+{{end}}
+{{end}}

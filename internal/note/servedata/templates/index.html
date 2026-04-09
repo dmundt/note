@@ -1,0 +1,696 @@
+{{define "index"}}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <meta name="description" content="{{.OGDescription}}" />
+  <meta property="og:title" content="{{.OGTitle}}" />
+  <meta property="og:description" content="{{.OGDescription}}" />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="{{.CanonicalURL}}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #1a2333;
+      --muted: #5d6c82;
+      --line: #d8e0ec;
+      --accent: #2359d1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Open Sans", sans-serif;
+      color: var(--text);
+      background: linear-gradient(120deg, #eef3ff, #f8f9fc);
+    }
+
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #f5f7fb;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .header-home {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .header-home:hover {
+      color: var(--accent);
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      padding: 2px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      background: #fff;
+    }
+
+    .btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 6px 10px;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      background: #f3f6fc;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+    }
+
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 8px 10px;
+    }
+
+    .stat .k {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat .v {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .panel h2 {
+      margin: 0;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 16px;
+    }
+
+    .filters {
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .filter-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 8px 0 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 3px 8px;
+      font-size: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      background: #f3f6fc;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .filters input,
+    .filters select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+    }
+
+    .input-wrap input {
+      padding-right: 28px;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 4px;
+    }
+
+    .clear-btn:hover {
+      color: var(--accent);
+    }
+
+    .input-wrap input:placeholder-shown+.clear-btn {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .notes {
+      max-height: 70vh;
+      overflow: auto;
+      position: relative;
+      border-top: 1px solid var(--line);
+    }
+
+    .notes.htmx-request::before {
+      content: "Loading notes...";
+      display: block;
+      padding: 10px 12px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .note-link {
+      display: block;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .note-link:hover {
+      background: #f7f9ff;
+    }
+
+    .note-link.is-selected {
+      background: #eaf0ff;
+      border-left: 3px solid var(--accent);
+      padding-left: 9px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tag-link {
+      display: inline-block;
+      border: 1px solid #c7d7ec;
+      padding: 2px 8px;
+      margin: 0 6px 6px 0;
+      font-size: 12px;
+      color: #2f4f78;
+      text-decoration: none;
+      background: #e8f1ff;
+    }
+
+    .tag-link:hover {
+      background: #dce9fb;
+      border-color: #aac3e3;
+    }
+
+    .content {
+      padding: 14px;
+      min-height: 70vh;
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .content.htmx-request::before {
+      content: "Loading note...";
+      position: absolute;
+      inset: 0;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    body.mode-compact .content {
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .detail-inner {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    body.maxwidth-on .detail-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .content th,
+    .content td {
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .content th {
+      background: #f3f6fc;
+      font-weight: 600;
+    }
+
+    .content pre {
+      border: 1px solid var(--line);
+      background: #f9fbff;
+      padding: 10px;
+      overflow: auto;
+      position: relative;
+    }
+
+    .code-copy {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 11px;
+      padding: 3px 6px;
+      cursor: pointer;
+    }
+
+    .content ul.contains-task-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .content .task-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+    }
+
+    .sidebar-mini {
+      border-top: 1px solid var(--line);
+      padding: 10px 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+    }
+
+    .mini a {
+      display: inline-block;
+      margin: 0 6px 6px 0;
+      text-decoration: none;
+      color: #3f3455;
+      border: 1px solid var(--line);
+      padding: 2px 6px;
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .mini a:hover {
+      border-color: var(--accent);
+      background: #f3f6fc;
+    }
+
+    .top-tag-chip {
+      border-color: #c7d7ec;
+      background: #e8f1ff;
+      color: #2f4f78;
+    }
+
+    .top-tag-chip:hover {
+      border-color: #aac3e3;
+      background: #dce9fb;
+    }
+
+    .recent-chip {
+      border-color: #c7d8ee;
+      background: linear-gradient(135deg, #eaf5fb, #e7eefc);
+      color: #2f4d6c;
+    }
+
+    .recent-chip:hover {
+      border-color: #9ebadc;
+      background: linear-gradient(135deg, #dff0fa, #dce7fb);
+    }
+
+    .banner {
+      border: 1px solid #e5b447;
+      background: #fff5dc;
+      color: #6a4a00;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 14px;
+    }
+
+    .footer {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 10px 0 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    mark {
+      background: #ffed99;
+      padding: 0 1px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .notes {
+        max-height: 40vh;
+      }
+
+      .content {
+        min-height: 40vh;
+      }
+    }
+
+    @media print {
+
+      .sticky-header,
+      .filters,
+      .sidebar-mini,
+      .footer,
+      .chips,
+      .btns,
+      #notes-list {
+        display: none !important;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        border: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="sticky-header">
+    <div class="header-inner">
+      <div class="header-title">
+        <a class="header-home" href="/">{{.WorkspaceName}}</a>
+      </div>
+    </div>
+  </header>
+  <div class="wrap">
+    {{if .ParseErrors}}
+    <div class="banner">
+      parse errors detected ({{len .ParseErrors}}). run <strong>note doctor</strong> for full diagnostics.
+    </div>
+    {{end}}
+    <div class="grid">
+      <section class="panel">
+        <h2>Overview</h2>
+        <div class="filters">
+          <div class="filter-tools">
+            <div class="meta">Use / to focus search. j/k to move, Enter to open.</div>
+            <a class="btn" href="/" onclick="clearAllFilters(); return false;">Clear all filters</a>
+          </div>
+          {{if .ActiveChips}}
+          <div class="chips">
+            {{range .ActiveChips}}
+            <a class="chip" href="{{.URL}}">{{.Key}}={{.Value}} x</a>
+            {{end}}
+          </div>
+          {{end}}
+        </div>
+        <form id="filters" class="filters" hx-get="/notes" hx-target="#notes-list"
+          hx-trigger="input delay:250ms from:input, change from:select" hx-push-url="true" hx-swap="innerHTML">
+          <div class="input-wrap">
+            <input type="text" name="q" placeholder="Search" value="{{.Filters.Query}}" />
+            <button type="button" class="clear-btn" aria-label="Clear search"
+              onclick="const i=this.previousElementSibling;i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));i.focus();">x</button>
+          </div>
+          <select name="type">
+            <option value="" {{if eq .Filters.Type "" }}selected{{end}}>all types</option>
+            <option value="fleeting" {{if eq .Filters.Type "fleeting" }}selected{{end}}>fleeting</option>
+            <option value="permanent" {{if eq .Filters.Type "permanent" }}selected{{end}}>permanent</option>
+            <option value="project" {{if eq .Filters.Type "project" }}selected{{end}}>project</option>
+          </select>
+          <div class="input-wrap">
+            <input type="text" name="project" placeholder="Project slug" value="{{.Filters.Project}}" />
+            <button type="button" class="clear-btn" aria-label="Clear project"
+              onclick="const i=this.previousElementSibling;i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));i.focus();">x</button>
+          </div>
+          <div class="input-wrap">
+            <input type="text" name="tag" placeholder="Tag" value="{{.Filters.Tag}}" />
+            <button type="button" class="clear-btn" aria-label="Clear tag"
+              onclick="const i=this.previousElementSibling;i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));i.focus();">x</button>
+          </div>
+        </form>
+        <div id="notes-list" class="notes">{{template "notes_list" .}}</div>
+        <aside class="sidebar-mini">
+          <div class="mini">
+            <h3>Top tags</h3>
+            {{if .TopTags}}
+            {{range .TopTags}}
+            <a class="top-tag-chip" href="/?tag={{.Tag}}"
+              onclick="event.preventDefault(); const t=document.querySelector('#filters input[name=tag]'); if(!t) return; t.value='{{js .Tag}}'; t.dispatchEvent(new Event('input',{bubbles:true}));">{{.Tag}}
+              ({{.Count}})</a>
+            {{end}}
+            {{else}}
+            <span class="meta">No tags yet.</span>
+            {{end}}
+          </div>
+          <div class="mini">
+            <h3>Recent notes</h3>
+            {{range .RecentNotes}}
+            <a class="recent-chip" href="/note/{{.ID}}" hx-get="/note/{{.ID}}" hx-include="#filters" hx-push-url="true"
+              hx-target="#note-detail" hx-swap="innerHTML">{{.ID}}</a>
+            {{end}}
+          </div>
+        </aside>
+      </section>
+      <section class="panel">
+        <h2>Detail</h2>
+        <div id="note-detail" class="content">
+          {{if .Detail}}
+          {{.Detail}}
+          {{else}}
+          <div class="empty">Select a note from the list.</div>
+          {{end}}
+        </div>
+      </section>
+    </div>
+    <footer class="footer">
+      <div>{{.Stats.Total}} notes indexed | refreshed {{.GeneratedAt}}</div>
+      <div>shortcuts: / search, j/k select, Enter open</div>
+    </footer>
+  </div>
+  <script>
+    (function () {
+      const body = document.body;
+      const savedMode = localStorage.getItem('note-mode') || 'comfortable';
+      const savedWidth = localStorage.getItem('note-maxwidth') || 'off';
+      if (savedMode === 'compact') body.classList.add('mode-compact');
+      if (savedWidth === 'on') body.classList.add('maxwidth-on');
+
+      window.setMode = function (mode) {
+        body.classList.toggle('mode-compact', mode === 'compact');
+        localStorage.setItem('note-mode', mode);
+      }
+
+      window.toggleMaxWidth = function () {
+        body.classList.toggle('maxwidth-on');
+        localStorage.setItem('note-maxwidth', body.classList.contains('maxwidth-on') ? 'on' : 'off');
+      }
+
+      window.clearAllFilters = function () {
+        const f = document.getElementById('filters');
+        if (!f) return;
+        f.reset();
+        const firstInput = f.querySelector('input');
+        if (firstInput) {
+          firstInput.dispatchEvent(new Event('input', { bubbles: true }));
+          return;
+        }
+        const firstSelect = f.querySelector('select');
+        if (firstSelect) {
+          firstSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+
+      function attachCodeCopyButtons(root) {
+        root.querySelectorAll('pre').forEach((pre) => {
+          if (pre.querySelector('.code-copy')) return;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'code-copy';
+          btn.textContent = 'copy';
+          btn.addEventListener('click', () => {
+            navigator.clipboard.writeText(pre.innerText || '').then(() => { btn.textContent = 'copied'; setTimeout(() => btn.textContent = 'copy', 900); });
+          });
+          pre.appendChild(btn);
+        });
+      }
+
+      function ensureSelected() {
+        const links = Array.from(document.querySelectorAll('#notes-list .note-link'));
+        links.forEach((a, idx) => {
+          if (!a.dataset.index) a.dataset.index = String(idx);
+          a.addEventListener('click', () => {
+            sessionStorage.setItem('note-selected-id', a.dataset.noteId || '');
+            links.forEach(x => x.classList.remove('is-selected'));
+            a.classList.add('is-selected');
+          });
+        });
+        const sel = sessionStorage.getItem('note-selected-id');
+        if (!sel) return;
+        const cur = document.querySelector('#notes-list .note-link[data-note-id="' + sel + '"]');
+        if (cur) cur.classList.add('is-selected');
+      }
+
+      function moveSelection(delta) {
+        const links = Array.from(document.querySelectorAll('#notes-list .note-link'));
+        if (!links.length) return;
+        let idx = links.findIndex(a => a.classList.contains('is-selected'));
+        if (idx < 0) idx = 0;
+        idx = Math.max(0, Math.min(links.length - 1, idx + delta));
+        links.forEach(a => a.classList.remove('is-selected'));
+        links[idx].classList.add('is-selected');
+        links[idx].scrollIntoView({ block: 'nearest' });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        const active = document.activeElement;
+        const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+        if (e.key === '/' && !typing) {
+          e.preventDefault();
+          const s = document.querySelector('#filters input[name=q]');
+          if (s) s.focus();
+        }
+        if ((e.key === 'j' || e.key === 'k') && !typing) {
+          e.preventDefault();
+          moveSelection(e.key === 'j' ? 1 : -1);
+        }
+        if (e.key === 'Enter' && !typing) {
+          const sel = document.querySelector('#notes-list .note-link.is-selected');
+          if (sel) {
+            e.preventDefault();
+            sel.click();
+          }
+        }
+      });
+
+      document.body.addEventListener('htmx:afterSwap', (e) => {
+        if (e.target.id === 'note-detail' || e.target.id === 'notes-list') {
+          attachCodeCopyButtons(document);
+          ensureSelected();
+        }
+      });
+
+      attachCodeCopyButtons(document);
+      ensureSelected();
+    })();
+  </script>
+</body>
+
+</html>
+{{end}}

@@ -1,0 +1,4 @@
+total: 3
+fleeting: 1
+permanent: 1
+project: 1

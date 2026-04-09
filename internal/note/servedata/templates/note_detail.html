@@ -1,0 +1,83 @@
+{{define "note_detail"}}
+<article class="detail-inner">
+  <div
+    style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:0 0 10px;">
+    <h3 style="margin:0;">{{.Note.Title}}</h3>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" type="button" onclick="navigator.clipboard.writeText('{{.Note.ID}}')">copy id</button>
+      <button class="btn" type="button"
+        onclick="navigator.clipboard.writeText(window.location.origin + '/note/{{.Note.ID}}')">copy permalink</button>
+      <button class="btn" type="button" onclick="navigator.clipboard.writeText('{{js .CopyMarkdownURL}}')">copy
+        md-link</button>
+    </div>
+  </div>
+  <div class="meta" style="margin-bottom:12px;">
+    {{.Note.ID}} · {{.Note.Type}} · {{.Note.Path}}
+    {{if .Project}} · project: {{.Project}}{{end}}
+  </div>
+
+  {{if .Tags}}
+  <div style="margin-bottom:12px;">
+    {{range .Tags}}
+    <a class="tag-link" href="/?tag={{urlquery .}}" hx-get="/notes" hx-include="#filters" hx-target="#notes-list"
+      hx-swap="innerHTML" hx-vals='js:{tag: "{{js .}}"}'
+      hx-on:click="document.querySelector('#filters input[name=tag]').value='{{js .}}';">{{.}}</a>
+    {{end}}
+  </div>
+  {{end}}
+
+  {{if .BrokenLinks}}
+  <div class="banner" style="margin-bottom:10px;">broken outbound links detected: {{len .BrokenLinks}}</div>
+  {{end}}
+
+  <details style="margin:0 0 10px;">
+    <summary>Frontmatter</summary>
+    <pre style="margin-top:8px;">{{range .Frontmatter}}{{.Key}}: {{.Value}}
+{{end}}</pre>
+  </details>
+
+  {{if .Toc}}
+  <details style="margin:0 0 10px;">
+    <summary>Table of contents</summary>
+    <div style="margin-top:8px; display:grid; gap:4px;">
+      {{range .Toc}}
+      <a href="#{{.ID}}" class="meta" style="padding-left:{{.Level}}em;">{{.Text}}</a>
+      {{end}}
+    </div>
+  </details>
+  {{end}}
+
+  <div>{{.BodyHTML}}</div>
+
+  <hr style="border:none;border-top:1px solid #d8e0ec;margin:20px 0;" />
+  <h4>Backlinks</h4>
+  {{if not .Backlinks}}
+  <div class="meta">No backlinks.</div>
+  {{else}}
+  {{range .Backlinks}}
+  <a class="note-link" style="padding-left:0;" href="/note/{{.ID}}" hx-get="/note/{{.ID}}" hx-include="#filters"
+    hx-push-url="true" hx-target="#note-detail" hx-swap="innerHTML">
+    <strong>{{.TitleHTML}}</strong>
+    <div class="meta">{{.ID}} · {{.Type}} · {{.PathHTML}}</div>
+  </a>
+  {{end}}
+  {{end}}
+
+  <details style="margin:12px 0 0;" {{if not .OutboundLinks}}open{{end}}>
+    <summary>Outbound links</summary>
+    <div style="margin-top:8px;">
+      {{if not .OutboundLinks}}
+      <div class="meta">No outbound links.</div>
+      {{else}}
+      {{range .OutboundLinks}}
+      <div class="meta" style="margin:4px 0;">
+        <a href="{{.Href}}" {{if .ID}}hx-get="{{.Href}}" hx-include="#filters" hx-push-url="true"
+          hx-target="#note-detail" hx-swap="innerHTML" {{end}}>{{.Label}}</a>
+        {{if not .Exists}} <strong style="color:#9b1c1c;">(broken)</strong>{{end}}
+      </div>
+      {{end}}
+      {{end}}
+    </div>
+  </details>
+</article>
+{{end}}
